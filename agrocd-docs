@@ -1,0 +1,32 @@
+steps to install argocd
+-----------------------
+minikube status
+minikube start
+
+Agrocd installation in 3 ways :
+1.YAML
+2.Helm
+3.Operator
+
+From oficial documents:
+
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl get pods -n argocd -w
+kubectl get svc -n argocd
+
+To access the Agrocd in browser, we need to change the ClusterIp to NodePort mode.
+ kubectl edit svc -n argocd-server -n argocd
+
+minikube service list -n argocd
+
+minikube service argocd-server -n argocd  //to access the web url
+Here we required argocd username and password.
+username:admin
+for password purpose.
+kubectl get secret -n agrocd //here we get the password ,but needs to be decode.
+echo axllllll---mc  | base64 --decode
+
+we can create application using normal YAML files and helm charts,by using ui and cli
+https://github.com/argoproj/argocd-example-apps.
+Cli purpose :needs to be  install agrocd cli
