@@ -1,3 +1,15 @@
+GitOps Tools:
+-------------
+Best Popular GitOps Tools
+1.Agrocd
+2.Fluxcd
+3.Jenkinsx
+4.Spinnaker
+
+
+
+
+
 steps to install argocd
 -----------------------
 minikube status
