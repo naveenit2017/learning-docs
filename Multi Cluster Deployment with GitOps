@@ -1,0 +1,35 @@
+Multi Cluster Deployment with GitOps
+EKS Clusters Creation:
+
+eksctl create cluster --name hub-cluster --region us-west-1
+
+eksctl create cluster --name spoke-cluster-1 --region us-west-1
+
+eksctl create cluster --name spoke-cluster-2 --region us-west-1
+
+--------------------
+kubectl config get-contexts  //It will give all the available clusters
+kubectl config get-contexts | grep us-west-1  
+
+kubectl config use-context  iam-root-account@hub-cluster.us-west-1.eksctl.io  //use cluster
+kubectl config current-context  //it will show the setup cluster.
+
+Now install the argocd :
+------------------------
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/core-install.yaml
+
+kubectl get pods -n argocd
+kubectl get cm -n argocd  //get config map
+ kubectl edit configmap argocd-cmd-params-cm -n argocd
+//add this line below
+data:
+ server.insecure: "true"
+
+kubectl describe deploy/argocd-repo-server -n argocd
+kubectl edit deploy/argocd-repo-server -n argocd
+kubectl get pods -n argocd
+kubectl get svc -n argocd
+kubectl edit svc argocd-repo-server -n argocd  //change the type ClusterIp to NodePort
+
+
