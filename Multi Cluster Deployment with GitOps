@@ -60,3 +60,5 @@ argocd cluster add iam-root-account@spoke-cluster-1.us-west-2.eksctl.io --server
 argocd cluster add iam-root-account@spoke-cluster-2.us-west-2.eksctl.io --server 54.185.179.5:30362
 
 kubectl edit configmap
+
+delete clusters:
