@@ -8,6 +8,9 @@ eksctl create cluster --name spoke-cluster-1 --region us-west-1
 eksctl create cluster --name spoke-cluster-2 --region us-west-1
 
 --------------------
+
+
+
 kubectl config get-contexts  //It will give all the available clusters
 kubectl config get-contexts | grep us-west-1  
 
@@ -17,19 +20,43 @@ kubectl config current-context  //it will show the setup cluster.
 Now install the argocd :
 ------------------------
 kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/core-install.yaml
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-kubectl get pods -n argocd
+kubectl get pods -n argocd // to see all the pods below are should run under the argocd namespace.
+NAME                                                READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0                     1/1     Running   0          8m15s
+argocd-applicationset-controller-584f68b9d7-th4p2   1/1     Running   0          8m16s
+argocd-dex-server-bc5bd5b7c-rkd7k                   1/1     Running   0          20s
+argocd-notifications-controller-564dcb4995-lhpkn    1/1     Running   0          20s
+argocd-redis-76748db5f4-b8lqp                       1/1     Running   0          8m15s
+argocd-repo-server-6db44766fc-jv9hf                 1/1     Running   0          8m15s
+argocd-server-78c5d46cc-sjr4z                       0/1     Running   0          20s
+
+
+
 kubectl get cm -n argocd  //get config map
- kubectl edit configmap argocd-cmd-params-cm -n argocd
+Note : Here we will run argo-cd api server insecure mode,argocd will have the two modes HTTP &HTTPS mode so if want't to implement HTTPs need for CA(certificate Authinitication)
+Just practice purpose enabling insecure mode.
+
+kubectl edit configmap argocd-cmd-params-cm -n argocd
 //add this line below
 data:
  server.insecure: "true"
 
-kubectl describe deploy/argocd-repo-server -n argocd
-kubectl edit deploy/argocd-repo-server -n argocd
-kubectl get pods -n argocd
 kubectl get svc -n argocd
-kubectl edit svc argocd-repo-server -n argocd  //change the type ClusterIp to NodePort
+kubectl edit svc argocd-server -n argocd //Change the ClusterIp mode to NodePort to access anyone.
 
+To access the argocd web user interface, needs to be open http port and required admin username&password
+ kubectl get secrets -n argocd
+ kubectl edit secret argocd-initial-admin-secret -n argocd
+ echo ZHh3T0dpVHhteGxuSmxPSA== | base64 --decode
+https://54.185.179.5:30362
+username:admin
+password will get from above secrets 
 
+Now we need to add two more clusters,through argocd not possible hence required argocd cli
+
+argocd cluster add iam-root-account@spoke-cluster-1.us-west-2.eksctl.io --server 54.185.179.5:30362
+argocd cluster add iam-root-account@spoke-cluster-2.us-west-2.eksctl.io --server 54.185.179.5:30362
+
+kubectl edit configmap
